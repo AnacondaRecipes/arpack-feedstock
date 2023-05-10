@@ -1,4 +1,4 @@
-About arpack
+About `arpack`
 ============
 
 Home: https://github.com/opencollab/arpack-ng
