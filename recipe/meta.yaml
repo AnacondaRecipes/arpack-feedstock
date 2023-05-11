@@ -50,8 +50,6 @@ requirements:
     - {{ compiler('m2w64_c') }}  # [win]
     - {{ compiler('m2w64_cxx') }}  # [win]
   host:
-    - libblas
-    - liblapack
     - {{ mpi }}  # [mpi != 'nompi']
   run:
     - {{ mpi }}  # [mpi != 'nompi']
