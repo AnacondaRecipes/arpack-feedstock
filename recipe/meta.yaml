@@ -50,7 +50,7 @@ requirements:
     - {{ compiler('m2w64_c') }}  # [win]
     - {{ compiler('m2w64_cxx') }}  # [win]
   host:
-    - openblas
+    - openblas {{ openblas }} # [blas_impl == "openblas"]
     - {{ mpi }}  # [mpi != 'nompi']
   run:
     - {{ mpi }}  # [mpi != 'nompi']
