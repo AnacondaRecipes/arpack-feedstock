@@ -22,3 +22,7 @@ do
     ..
   make install -j${CPU_COUNT} VERBOSE=1
 done
+
+if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
+  ctest --output-on-failure -j${CPU_COUNT}
+fi
