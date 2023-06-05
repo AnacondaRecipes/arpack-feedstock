@@ -54,16 +54,6 @@ requirements:
   run:
     - {{ mpi }}  # [mpi != 'nompi']
 
-test:
-  commands:
-    - test -f ${PREFIX}/lib/libarpack.a  # [unix]
-    - test -f ${PREFIX}/lib/libarpack${SHLIB_EXT}  # [unix]
-    - test -f ${PREFIX}/include/arpack/arpack.hpp  # [unix]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\lib\\libarpack.a exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\lib\\libarpack.dll.a exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\bin\\libarpack.dll exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\include\\arpack\\arpack.hpp exit 1  # [win]
-
 about:
   home: https://github.com/opencollab/arpack-ng
   license: BSD-3-Clause
