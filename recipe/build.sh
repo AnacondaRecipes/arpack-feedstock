@@ -4,9 +4,9 @@ set -x
 
 mkdir build && cd build
 
-if [[ "$(echo $fortran_compiler_version | cut -d '.' -f 1)" -gt 9 ]]; then
-  export FFLAGS="$FFLAGS -fallow-argument-mismatch"
-fi
+#if [[ "$(echo $fortran_compiler_version | cut -d '.' -f 1)" -gt 9 ]]; then
+#  export FFLAGS="$FFLAGS -fallow-argument-mismatch"
+#fi
 
 if [[ ${HOST} =~ .*linux.* ]]; then
   # Need to point to libquadmath.so.0
@@ -16,6 +16,7 @@ fi
 for shared_libs in OFF ON
 do
   cmake ${CMAKE_ARGS} \
+    -DCMAKE_Fortran_FLAGS="-fallow-argument-mismatch" \
     -DCMAKE_PREFIX_PATH=${PREFIX} \
     -DCMAKE_INSTALL_PREFIX=${PREFIX} \
     -DCMAKE_INSTALL_LIBDIR=lib \
