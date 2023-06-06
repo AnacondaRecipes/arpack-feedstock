@@ -23,5 +23,7 @@ do
 done
 
 if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
+  # Need to point to libquadmath.so.0 for tests to pass...
+  export LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
   ctest --output-on-failure -j${CPU_COUNT}
 fi
