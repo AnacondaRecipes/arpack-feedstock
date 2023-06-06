@@ -15,8 +15,7 @@ do
     -DCMAKE_INSTALL_PREFIX=${PREFIX} \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_SHARED_LIBS=${shared_libs} \
-    -DLAPACK_LIBRARIES="-llapack" \
-    -DBLAS_LIBRARIES="-lblas" \
+    -DBLAS_LIBRARIES="-lopenblas" \
     -DICB=ON \
     -DMPI=${DMPI} \
     ..

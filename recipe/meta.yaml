@@ -51,10 +51,10 @@ requirements:
     - {{ compiler('m2w64_cxx') }}  # [win]
   host:
     - {{ mpi }}  # [mpi != 'nompi']
-    - openblas {{ openblas }}  # [blas_impl == "openblas"]
+    - openblas {{ openblas }}
   run:
     - {{ mpi }}  # [mpi != 'nompi']
-    - libopenblas  # [blas_impl == "openblas"]
+    - libopenblas
 
 test:
   commands:
