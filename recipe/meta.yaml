@@ -1,4 +1,4 @@
-{% set version = "3.8.0" %}
+{% set version = "3.9.0" %}
 {% set build = 1 %}
 
 # ensure mpi is defined (needed for conda-smithy recipe-lint)
@@ -16,7 +16,7 @@ package:
 source:
   fn: arpack-{{ version }}.tar.gz
   url: https://github.com/opencollab/arpack-ng/archive/{{ version }}.tar.gz
-  sha256: ada5aeb3878874383307239c9235b716a8a170c6d096a6625bfd529844df003d
+  sha256: 24f2a2b259992d3c797d80f626878aa8e2ed5009d549dad57854bbcfb95e1ed0
 
 build:
   number: {{ build }}
@@ -49,12 +49,18 @@ requirements:
     - {{ compiler('m2w64_fortran') }}  # [win]
     - {{ compiler('m2w64_c') }}  # [win]
     - {{ compiler('m2w64_cxx') }}  # [win]
+    - llvm-openmp  # [osx and not (blas_impl == "mkl")]
   host:
     - {{ mpi }}  # [mpi != 'nompi']
-    - openblas {{ openblas }}
+    - openblas {{ openblas }}  # [blas_impl == "openblas"]
+    - mkl-devel {{ mkl }}.*  # [blas_impl == "mkl"]
+    - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
+    - intel-openmp {{ mkl }}  # [blas_impl == "mkl"]
   run:
     - {{ mpi }}  # [mpi != 'nompi']
-    - libopenblas
+    - libopenblas  # [blas_impl == "openblas"]
+    - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
+    - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
 
 test:
   commands:
