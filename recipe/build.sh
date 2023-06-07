@@ -49,9 +49,11 @@ do
     -DMPI=${DMPI} \
     ..
 
-  if [[ ${mpi} != 'nompi' ]]; then
-    sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_cpp.dir/flags.make
-    sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_c.dir/flags.make
+  if [[ ${HOST} =~ .*darwin.* ]]; then
+    if [[ ${mpi} != 'nompi' ]]; then
+      sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_cpp.dir/flags.make
+      sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_c.dir/flags.make
+    fi
   fi
   make install -j${CPU_COUNT} VERBOSE=1
 done
