@@ -8,25 +8,6 @@ if [[ "$(echo $fortran_compiler_version | cut -d '.' -f 1)" -gt 9 ]]; then
   export FFLAGS="$FFLAGS -fallow-argument-mismatch"
 fi
 
-case "${blas_impl}" in
-        mkl)
-            export BLAS="MKL"
-            export USE_MKL=1
-            export USE_MKLDNN=1
-	    export BLA_VENDOR="Intel"
-            ;;
-        openblas)
-            export BLAS="OpenBLAS"
-            export USE_MKL=0
-            export USE_MKLDNN=0
-	    export BLA_VENDOR="OpenBLAS"
-            ;;
-        *)
-            echo "[ERROR] Unsupported BLAS implementation '${blas_impl}'" >&2
-            exit 1
-            ;;
-    esac
-
 if [[ ${HOST} =~ .*linux.* ]]; then
   # Need to point to libquadmath.so.0
   export LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
@@ -47,6 +28,7 @@ do
     -DBUILD_SHARED_LIBS=${shared_libs} \
     -DICB=ON \
     -DMPI=${DMPI} \
+    -DBLAS_LIBRARIES="-lopenblas" \
     ..
 
   if [[ ${HOST} =~ .*darwin.* ]]; then
@@ -59,5 +41,8 @@ do
 done
 
 if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
-  ctest --output-on-failure -j${CPU_COUNT}
+  # Do not run ctest on osx as it causes our ci to crash.
+  if [[ ${HOST} =~ .*linux.* ]]; then
+    ctest --output-on-failure -j${CPU_COUNT}
+  fi
 fi
