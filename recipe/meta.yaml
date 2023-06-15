@@ -38,13 +38,13 @@ requirements:
     - {{ compiler('m2w64_fortran') }}  # [win]
     - {{ compiler('m2w64_c') }}  # [win]
     - {{ compiler('m2w64_cxx') }}  # [win]
-    - llvm-openmp  # [osx]
+    - llvm-openmp  # [osx and (mpi != 'nompi')]
   host:
     - {{ mpi }}  # [mpi != 'nompi']
-    - openblas {{ openblas }}
+    - openblas {{ openblas }}  # [mpi != 'nompi']
   run:
     - {{ mpi }}  # [mpi != 'nompi']
-    - libopenblas
+    - libopenblas  # [mpi != 'nompi']
 
 test:
   commands:
