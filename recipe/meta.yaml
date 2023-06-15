@@ -12,7 +12,6 @@ source:
 
 build:
   number: {{ build }}
-  skip: true  # [blas_impl == "mkl"]
   # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi
   # add build string so packages can depend on
   # mpi or nompi variants explicitly:
@@ -39,13 +38,13 @@ requirements:
     - {{ compiler('m2w64_fortran') }}  # [win]
     - {{ compiler('m2w64_c') }}  # [win]
     - {{ compiler('m2w64_cxx') }}  # [win]
-    - llvm-openmp  # [osx and not (blas_impl == "mkl")]
+    - llvm-openmp  # [osx]
   host:
     - {{ mpi }}  # [mpi != 'nompi']
-    - openblas {{ openblas }}  # [blas_impl == "openblas"]
+    - openblas {{ openblas }}
   run:
     - {{ mpi }}  # [mpi != 'nompi']
-    - libopenblas  # [blas_impl == "openblas"]
+    - libopenblas
 
 test:
   commands:

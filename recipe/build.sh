@@ -41,7 +41,7 @@ do
 done
 
 if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
-  # Do not run ctest on osx as it causes our ci to crash.
+  # Do not run the test on osx as this test causes OS crashes on certain osx configurations.
   if [[ ${HOST} =~ .*linux.* ]]; then
     ctest --output-on-failure -j${CPU_COUNT}
   fi
