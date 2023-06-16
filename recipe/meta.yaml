@@ -47,15 +47,15 @@ requirements:
     - mkl-devel {{ mkl }}.*  # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
-    - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
+      # - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
   run:
     - {{ mpi }}  # [mpi != 'nompi']
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - libopenblas  # [blas_impl == "openblas"]
     # OpenMP
-    - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
-    - m2w64-gcc-libs  # [win]
+    # - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
+      # - m2w64-gcc-libs  # [win]
 
 test:
   commands:
