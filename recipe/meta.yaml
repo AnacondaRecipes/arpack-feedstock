@@ -55,6 +55,7 @@ requirements:
     - libopenblas  # [blas_impl == "openblas"]
     # OpenMP
     - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
+    - m2w64-gcc-libs  # [win]
 
 test:
   commands:
