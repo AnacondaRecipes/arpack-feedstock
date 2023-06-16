@@ -11,6 +11,8 @@ cmake -G "MinGW Makefiles" ^
   -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
   -DBUILD_SHARED_LIBS=OFF ^
   -DICB=ON ^
+  -DMPI=OFF ^
+  -DBLA_VENDOR=Intel ^
   ..
 if errorlevel 1 exit 1
 
@@ -24,6 +26,8 @@ cmake -G "MinGW Makefiles" ^
   -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
   -DBUILD_SHARED_LIBS=ON ^
   -DICB=ON ^
+  -DMPI=OFF ^
+  -DBLA_VENDOR=Intel ^
   ..
 if errorlevel 1 exit 1
 

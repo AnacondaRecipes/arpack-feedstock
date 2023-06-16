@@ -13,7 +13,6 @@ source:
 build:
   number: {{ build }}
   skip: true  # [not win and blas_impl == "mkl"]
-  skip: true  # [win and blas_impl == "openblas"]
   # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi
   # add build string so packages can depend on
   # mpi or nompi variants explicitly:
@@ -47,16 +46,15 @@ requirements:
     - mkl-devel {{ mkl }}.*  # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
-      # - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
+    - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
   run:
+    - m2w64-gcc-libgfortran  # [win]
     - {{ mpi }}  # [mpi != 'nompi']
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - libopenblas  # [blas_impl == "openblas"]
     # OpenMP
-    # - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
-      # - m2w64-gcc-libs  # [win]
-    - m2w64-gcc-libgfortran  # [win]
+    - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
 
 test:
   commands:
