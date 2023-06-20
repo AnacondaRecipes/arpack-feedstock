@@ -29,6 +29,7 @@ do
     -DICB=ON \
     -DMPI=${DMPI} \
     -DBLAS_LIBRARIES="-lopenblas" \
+    -DEIGEN=ON \
     ..
 
   if [[ ${HOST} =~ .*darwin.* ]]; then
