@@ -1,4 +1,4 @@
 mpi:
   - nompi
-  - mpich    # [not win and not (osx and arm64)]
-  - openmpi  # [not win and not (osx and arm64)]
+  - mpich  # [not win]
+  - openmpi  # [osx and arm64]

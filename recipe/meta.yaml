@@ -1,31 +1,25 @@
-{% set version = "3.8.0" %}
-{% set build = 1 %}
-
-# ensure mpi is defined (needed for conda-smithy recipe-lint)
-{% set mpi = mpi or 'nompi' %}
-
-{% if mpi == 'nompi' %}
-# prioritize nompi variant via build number
-{% set build = build + 100 %}
-{% endif %}
+{% set version = "3.9.0" %}
+{% set name = "arpack" %}
+{% set build = 0 %}
 
 package:
-  name: arpack
+  name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: arpack-{{ version }}.tar.gz
-  url: https://github.com/opencollab/arpack-ng/archive/{{ version }}.tar.gz
-  sha256: ada5aeb3878874383307239c9235b716a8a170c6d096a6625bfd529844df003d
+  url: https://github.com/opencollab/{{ name }}-ng/archive/{{ version }}.tar.gz
+  sha256: 24f2a2b259992d3c797d80f626878aa8e2ed5009d549dad57854bbcfb95e1ed0
 
 build:
   number: {{ build }}
+  # Arpack on win is built against mkl and nompi; Arpack on other archs is built against openblas and either nompi or mpich. 
+  # osx-arm64 also uses openblas + openmpi combination in addition to nompi and mpich. 
+  skip: true  # [not win and blas_impl == "mkl"]
+  # linux-ppc64le is switched off due to tests taking suspeciously long when run on prefect. 
+  skip: true  # [linux and ppc64le]
   # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi
   # add build string so packages can depend on
   # mpi or nompi variants explicitly:
-  # `pkg * mpi_mpich_*` for mpich
-  # `pkg * mpi_*` for any mpi
-  # `pkg * nompi_*` for no mpi
 
   {% if mpi != 'nompi' %}
   {% set mpi_prefix = "mpi_" + mpi %}
@@ -49,28 +43,49 @@ requirements:
     - {{ compiler('m2w64_fortran') }}  # [win]
     - {{ compiler('m2w64_c') }}  # [win]
     - {{ compiler('m2w64_cxx') }}  # [win]
+    - llvm-openmp  # [osx and not (blas_impl == "mkl")]
   host:
-    - libblas
-    - liblapack
+    # MPI/OpenMP
     - {{ mpi }}  # [mpi != 'nompi']
+    - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
+    # OpenBLAS or MKL
+    - mkl-devel {{ mkl }}.*  # [blas_impl == "mkl"]
+    - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
+    - openblas {{ openblas }}  # [blas_impl == "openblas"]
   run:
+    - m2w64-gcc-libgfortran  # [win]
+    # MPI/OpenMP
     - {{ mpi }}  # [mpi != 'nompi']
+    - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
+    # OpenBLAS or MKL
+    - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
+    - libopenblas  # [blas_impl == "openblas"]
 
 test:
   commands:
     - test -f ${PREFIX}/lib/libarpack.a  # [unix]
     - test -f ${PREFIX}/lib/libarpack${SHLIB_EXT}  # [unix]
-    - test -f ${PREFIX}/include/arpack/arpack.hpp  # [unix]
+    - test -f ${PREFIX}/include/arpack-ng/arpack.hpp  # [unix]
     - if not exist %PREFIX%\\Library\\mingw-w64\\lib\\libarpack.a exit 1  # [win]
     - if not exist %PREFIX%\\Library\\mingw-w64\\lib\\libarpack.dll.a exit 1  # [win]
     - if not exist %PREFIX%\\Library\\mingw-w64\\bin\\libarpack.dll exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\include\\arpack\\arpack.hpp exit 1  # [win]
+    - if not exist %PREFIX%\\Library\\mingw-w64\\include\\arpack-ng\\arpack.hpp exit 1  # [win]
 
 about:
   home: https://github.com/opencollab/arpack-ng
   license: BSD-3-Clause
+  license_family: BSD
   license_file: COPYING
   summary: Fortran77 subroutines designed to solve large scale eigenvalue problems
+  description: |
+    ARPACK (ARnoldi PACKage) is a software library for solving large-scale eigenvalue 
+    problems, particularly those arising from sparse matrices. It provides efficient 
+    algorithms for computing a few eigenvalues and corresponding eigenvectors of a 
+    large, sparse, and possibly non-Hermitian matrix. ARPACK offers a range of methods, 
+    including the Arnoldi iteration, Lanczos iteration, and implicitly restarted Arnoldi
+    method, to approximate eigenvalues and eigenvectors.
+  doc_url: https://github.com/opencollab/arpack-ng/tree/master/DOCUMENTS
+  dev_url: https://github.com/opencollab/arpack-ng
 
 extra:
   recipe-maintainers:
