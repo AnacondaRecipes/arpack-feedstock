@@ -52,7 +52,6 @@ requirements:
     - mkl-devel {{ mkl }}.*  # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
-    - eigen 3.3.7
   run:
     - m2w64-gcc-libgfortran  # [win]
     # MPI/OpenMP
@@ -61,7 +60,6 @@ requirements:
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - libopenblas  # [blas_impl == "openblas"]
-    - eigen
 
 test:
   commands:
