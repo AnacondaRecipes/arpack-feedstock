@@ -11,7 +11,6 @@ cmake -G "MinGW Makefiles" ^
   -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
   -DBUILD_SHARED_LIBS=OFF ^
   -DICB=ON ^
-  -DEIGEN=ON
   ..
 if errorlevel 1 exit 1
 
@@ -25,7 +24,6 @@ cmake -G "MinGW Makefiles" ^
   -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
   -DBUILD_SHARED_LIBS=ON ^
   -DICB=ON ^
-  -DEIGEN=ON
   ..
 if errorlevel 1 exit 1
 
