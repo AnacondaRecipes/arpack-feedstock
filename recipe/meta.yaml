@@ -1,6 +1,6 @@
 {% set version = "3.9.0" %}
 {% set name = "arpack" %}
-{% set build = 0 %}
+{% set build = 1 %}
 
 package:
   name: {{ name|lower }}
@@ -15,7 +15,7 @@ build:
   # Arpack on win is built against mkl and nompi; Arpack on other archs is built against openblas and either nompi or mpich. 
   # osx-arm64 also uses openblas + openmpi combination in addition to nompi and mpich. 
   skip: true  # [not win and blas_impl == "mkl"]
-  # linux-ppc64le is switched off due to tests taking suspeciously long when run on prefect. 
+  # linux-ppc64le is switched off due to tests taking suspiciously long when run on prefect.
   skip: true  # [linux and ppc64le]
   # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi
   # add build string so packages can depend on
@@ -88,6 +88,8 @@ about:
   dev_url: https://github.com/opencollab/arpack-ng
 
 extra:
+  skip-lints:
+    - host_section_needs_exact_pinnings
   recipe-maintainers:
     - jschueller
     - mrakitin
