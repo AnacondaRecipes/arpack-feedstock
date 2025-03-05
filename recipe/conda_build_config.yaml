@@ -1,3 +1,5 @@
+mkl:
+  - 2025
 mpi:
   - nompi
   - mpich  # [not win]
