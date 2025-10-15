@@ -1,6 +1,7 @@
 mkl:
   - 2025
+# Default: on osx-arm64 — only openmpi; others — nompi/mpich
 mpi:
-  - nompi
-  - mpich  # [not win]
-  - openmpi  # [osx and arm64]
+  - openmpi                # [osx and arm64]
+  - nompi                  # [not (osx and arm64)]
+  - mpich                  # [not (osx and arm64) and not win]
