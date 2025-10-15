@@ -19,6 +19,9 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   export FCFLAGS="$FCFLAGS -ff2c -fno-second-underscore"
 fi
 
+export BLA_VENDOR=OpenBLAS
+OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
+
 for shared_libs in OFF ON
 do
   cmake ${CMAKE_ARGS} \
@@ -28,7 +31,9 @@ do
     -DBUILD_SHARED_LIBS=${shared_libs} \
     -DICB=ON \
     -DMPI=${DMPI} \
-    -DBLAS_LIBRARIES="-lopenblas" \
+    -DBLA_VENDOR=OpenBLAS \
+    -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
+    -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
     ..
 
   if [[ ${HOST} =~ .*darwin.* ]]; then
