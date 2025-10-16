@@ -46,7 +46,8 @@ requirements:
     - llvm-openmp  # [osx and not (blas_impl == "mkl")]
   host:
     # MPI/OpenMP
-    - openmpi ==5.0.8  # [mpi == 'openmpi']
+    - openmpi ==5.0.8        # [mpi == 'openmpi']
+    - openmpi-mpifort        # [osx and mpi == 'openmpi']
     - {{ mpi }}              # [mpi == 'mpich']
     - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
     # OpenBLAS or MKL
@@ -63,7 +64,6 @@ requirements:
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     - libopenblas   # [blas_impl == "openblas"]
     - libgfortran5  # [linux]
-
 
 test:
   commands:
