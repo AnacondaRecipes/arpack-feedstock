@@ -17,10 +17,14 @@ if [[ ${HOST} =~ .*linux.* ]]; then
   export CXXFLAGS="$(printf '%s' "$CXXFLAGS" | sed 's/-fopenmp//g')"
 fi
 
+# if [[ ${HOST} =~ .*darwin.* ]]; then
+#   export LIBS="$LIBS -framework Accelerate"
+#   export FFLAGS="$FFLAGS -ff2c -fno-second-underscore"
+#   export FCFLAGS="$FCFLAGS -ff2c -fno-second-underscore"
+# fi
+
 if [[ ${HOST} =~ .*darwin.* ]]; then
-  export LIBS="$LIBS -framework Accelerate"
-  export FFLAGS="$FFLAGS -ff2c -fno-second-underscore"
-  export FCFLAGS="$FCFLAGS -ff2c -fno-second-underscore"
+  export FC="${BUILD_PREFIX}/bin/${HOST}-gfortran"
 fi
 
 export BLA_VENDOR=OpenBLAS
@@ -29,26 +33,31 @@ OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
 for shared_libs in OFF ON
 do
   cmake ${CMAKE_ARGS} \
+    -DCMAKE_Fortran_COMPILER="${FC}" \
     -DCMAKE_PREFIX_PATH=${PREFIX} \
     -DCMAKE_INSTALL_PREFIX=${PREFIX} \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_SHARED_LIBS=${shared_libs} \
     -DICB=ON \
     -DMPI=${DMPI} \
-    -DBUILD_TESTING=OFF \
     -DTESTS=OFF \
     -DEXAMPLES=OFF \
     -DBLA_VENDOR=OpenBLAS \
     -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
     -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
-    -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=ON \
     ..
 
-  if [[ ${HOST} =~ .*darwin.* ]]; then
-    if [[ ${mpi} != 'nompi' ]]; then
-      sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_cpp.dir/flags.make
-      sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_c.dir/flags.make
-    fi
+  # if [[ ${HOST} =~ .*darwin.* ]]; then
+  #   if [[ ${mpi} != 'nompi' ]]; then
+  #     sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_cpp.dir/flags.make
+  #     sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_c.dir/flags.make
+  #   fi
+  # fi
+  if [[ ${HOST} =~ .*darwin.* && "${DMPI}" == "ON" ]]; then
+    for f in "$PWD/CMakeFiles/icb_parpack_cpp.dir/flags.make" \
+            "$PWD/CMakeFiles/icb_parpack_c.dir/flags.make"; do
+      [ -f "$f" ] && sed -i '' 's/-fallow-argument-mismatch//g' "$f" || true
+    done
   fi
   make install -j${CPU_COUNT} VERBOSE=1
 done
