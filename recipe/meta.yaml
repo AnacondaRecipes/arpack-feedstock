@@ -65,7 +65,8 @@ requirements:
     - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
-    - libopenblas  # [blas_impl == "openblas"]
+    # - libopenblas  # [blas_impl == "openblas"]
+    - openblas {{ openblas }}  # [blas_impl == "openblas"]
 
 test:
   commands:
