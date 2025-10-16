@@ -33,10 +33,6 @@ build:
    - DMPI=ON  # [mpi != 'nompi']
    - DMPI=OFF  # [mpi == 'nompi']
 
-  ignore_run_exports:
-    - llvm-openmp        # [osx]
-    - libcxx             # [osx]
-
 requirements:
   build:
     - cmake
@@ -67,6 +63,7 @@ requirements:
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     # - libopenblas  # [blas_impl == "openblas"]
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
+
 
 test:
   commands:

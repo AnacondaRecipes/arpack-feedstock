@@ -5,3 +5,9 @@ mpi:
   - openmpi                # [osx and arm64]
   - nompi                  # [not (osx and arm64)]
   - mpich                  # [not (osx and arm64) and not win]
+openblas:
+  - 0.3.30 hb03180a_0   # linux-64
+libopenblas:
+  - 0.3.30 hf2bb037_0   # linux-64
+openblas-devel:
+  - 0.3.30 h1465027_0   # linux-64

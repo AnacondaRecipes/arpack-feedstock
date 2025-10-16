@@ -21,10 +21,6 @@ fi
 
 export BLA_VENDOR=OpenBLAS
 OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
-MATHLIB=""
-if [[ ${HOST} =~ .*linux.* ]]; then
-  MATHLIB=";m"
-fi
 
 for shared_libs in OFF ON
 do
@@ -39,8 +35,8 @@ do
     -DTESTS=OFF \
     -DEXAMPLES=OFF \
     -DBLA_VENDOR=OpenBLAS \
-    -DBLAS_LIBRARIES="${OPENBLAS_LIB}${MATHLIB}" \
-    -DLAPACK_LIBRARIES="${OPENBLAS_LIB}${MATHLIB}" \
+    -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
+    -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
     ..
 
   if [[ ${HOST} =~ .*darwin.* ]]; then
