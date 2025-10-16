@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Rationale summary:
+# - CMake couldn't find LAPACK → pass explicit BLAS/LAPACK = $PREFIX/lib/libopenblas${SHLIB_EXT} and set BLA_VENDOR=OpenBLAS.
+# - --error-overlinking for libgomp → strip -fopenmp from *FLAGS and forbid finding OpenMP.
+# - macOS Fortran compiler ABI test failed → force FC from build env, remove f2c flags, add rpath to $PREFIX/lib.
+# - macOS overlinking to Accelerate/libcxx/llvm-openmp → don't add Accelerate; ignore run_exports for libcxx/llvm-openmp in meta.yaml.
+
 set -x
 
 mkdir build && cd build
@@ -12,22 +18,21 @@ if [[ ${HOST} =~ .*linux.* ]]; then
   # Need to point to libquadmath.so.0
   export LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
   # Exclude -fopenmp from build due to linking erorr resolution for libgomp
+  # IMPORTANT: drop OpenMP from compile flags so we don't pull libgomp into runtime.
+  # Our repo does not ship 'libgomp', and --error-overlinking will flag it if present.
   export FFLAGS="$(printf '%s' "$FFLAGS" | sed 's/-fopenmp//g')"
   export CFLAGS="$(printf '%s' "$CFLAGS" | sed 's/-fopenmp//g')"
   export CXXFLAGS="$(printf '%s' "$CXXFLAGS" | sed 's/-fopenmp//g')"
 fi
 
-# if [[ ${HOST} =~ .*darwin.* ]]; then
-#   export LIBS="$LIBS -framework Accelerate"
-#   export FFLAGS="$FFLAGS -ff2c -fno-second-underscore"
-#   export FCFLAGS="$FCFLAGS -ff2c -fno-second-underscore"
-# fi
-
 if [[ ${HOST} =~ .*darwin.* ]]; then
+  # Force CMake to use the Fortran compiler from the build env (not host env).
   export FC="${BUILD_PREFIX}/bin/${HOST}-gfortran"
 fi
 
+# Tell CMake we want the OpenBLAS provider.
 export BLA_VENDOR=OpenBLAS
+# Pass the exact paths to BLAS/LAPACK to avoid FindLAPACK guessing (esp. under strict root paths).
 OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
 
 for shared_libs in OFF ON
@@ -47,12 +52,8 @@ do
     -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
     ..
 
-  # if [[ ${HOST} =~ .*darwin.* ]]; then
-  #   if [[ ${mpi} != 'nompi' ]]; then
-  #     sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_cpp.dir/flags.make
-  #     sed -i '' "s/-fallow-argument-mismatch//g" $SRC_DIR/build/CMakeFiles/icb_parpack_c.dir/flags.make
-  #   fi
-  # fi
+  # macOS: historical hack to strip '-fallow-argument-mismatch' from generated flags if present.
+  # Guarded to avoid failing when these targets are not generated.
   if [[ ${HOST} =~ .*darwin.* && "${DMPI}" == "ON" ]]; then
     for f in "$PWD/CMakeFiles/icb_parpack_cpp.dir/flags.make" \
             "$PWD/CMakeFiles/icb_parpack_c.dir/flags.make"; do
