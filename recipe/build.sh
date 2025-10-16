@@ -11,6 +11,10 @@ fi
 if [[ ${HOST} =~ .*linux.* ]]; then
   # Need to point to libquadmath.so.0
   export LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
+  # Exclude -fopenmp from build due to linking erorr resolution for libgomp
+  export FFLAGS="$(printf '%s' "$FFLAGS" | sed 's/-fopenmp//g')"
+  export CFLAGS="$(printf '%s' "$CFLAGS" | sed 's/-fopenmp//g')"
+  export CXXFLAGS="$(printf '%s' "$CXXFLAGS" | sed 's/-fopenmp//g')"
 fi
 
 if [[ ${HOST} =~ .*darwin.* ]]; then
@@ -37,6 +41,7 @@ do
     -DBLA_VENDOR=OpenBLAS \
     -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
     -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
+    -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=ON \
     ..
 
   if [[ ${HOST} =~ .*darwin.* ]]; then

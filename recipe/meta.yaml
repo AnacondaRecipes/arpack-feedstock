@@ -63,6 +63,7 @@ requirements:
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
     # - libopenblas  # [blas_impl == "openblas"]
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
+    - libgfortran5 >=11.2.0      # [linux]
 
 
 test:
