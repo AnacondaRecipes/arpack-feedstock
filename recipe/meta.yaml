@@ -1,6 +1,15 @@
+# Why 'openblas' in host but 'libopenblas' in run?
+# - host: we need headers + cmake/pkg-config metadata + the DSO for linking → 'openblas'.
+# - run: conda-build inspects actual DSOs (libopenblas.*), so the package that ships them must be listed → 'libopenblas'.
+#
+# If you ever get "undefined reference to expf@GLIBC_2.27", "logf@GLIBC_2.27", or similar errors on Linux:
+#   it means the OpenBLAS build you’re using was linked against a newer version of glibc (>= 2.27)
+#   than the one used by your current build environment.
+# To fix this, pin OpenBLAS to an older build from the 'defaults' channel that is compatible with your glibc version.
+
 {% set version = "3.9.0" %}
 {% set name = "arpack" %}
-{% set build = 1 %}
+{% set build = 2 %}
 
 package:
   name: {{ name|lower }}
@@ -46,20 +55,30 @@ requirements:
     - llvm-openmp  # [osx and not (blas_impl == "mkl")]
   host:
     # MPI/OpenMP
-    - {{ mpi }}  # [mpi != 'nompi']
+    - openmpi ==5.0.8        # [mpi == 'openmpi']
+    # MPI (Fortran wrappers are required on macOS so CMake can find MPI Fortran components).
+    - openmpi-mpifort        # [osx and mpi == 'openmpi']
+    - {{ mpi }}              # [mpi == 'mpich']
     - intel-openmp   {{ mkl }}  # [blas_impl == "mkl"]
     # OpenBLAS or MKL
     - mkl-devel {{ mkl }}.*  # [blas_impl == "mkl"]
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
+    # OpenBLAS provider for OpenBLAS builds.
+    # IMPORTANT: use 'openblas' in host so headers + CMake config are available.
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
   run:
     - m2w64-gcc-libgfortran  # [win]
     # MPI/OpenMP
-    - {{ mpi }}  # [mpi != 'nompi']
+    - openmpi   # [mpi == 'openmpi']
+    - {{ mpi }}              # [mpi == 'mpich']
     - {{ pin_compatible('intel-openmp') }}  # [blas_impl == "mkl"]
     # OpenBLAS or MKL
     - mkl {{ mkl }}.*  # [blas_impl == "mkl"]
-    - libopenblas  # [blas_impl == "openblas"]
+    # OpenBLAS runtime:
+    # IMPORTANT: runtime must contain the DSO provider ('libopenblas'), not the meta/devel pkg.
+    # This fixes conda-build --error-overlinking by matching actual ELF/DSO needs.
+    - libopenblas   # [blas_impl == "openblas"]
+    - libgfortran5  # [linux]
 
 test:
   commands:
