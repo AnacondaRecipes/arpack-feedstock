@@ -109,6 +109,7 @@ about:
 extra:
   skip-lints:
     - host_section_needs_exact_pinnings
+    - patch_unnecessary
   recipe-maintainers:
     - jschueller
     - mrakitin
