@@ -29,6 +29,9 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   # Force CMake to use the Fortran compiler from the build env (not host env).
   export FC="${BUILD_PREFIX}/bin/${HOST}-gfortran"
   export CMAKE_Fortran_FLAGS="${FFLAGS}"
+  SAVED_CPP="$CPP"; SAVED_CPPFLAGS="$CPPFLAGS"
+  SAVED_CPATH="$CPATH"; SAVED_CIP="$C_INCLUDE_PATH"; SAVED_CPLUSIP="$CPLUS_INCLUDE_PATH"
+  unset CPP CPPFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH
 fi
 
 # Tell CMake we want the OpenBLAS provider.
@@ -41,6 +44,7 @@ do
   cmake ${CMAKE_ARGS} \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_Fortran_COMPILER="${FC}" \
+    -DCMAKE_Fortran_FLAGS="${CMAKE_Fortran_FLAGS}" \
     -DCMAKE_PREFIX_PATH=${PREFIX} \
     -DCMAKE_INSTALL_PREFIX=${PREFIX} \
     -DCMAKE_INSTALL_LIBDIR=lib \
@@ -53,6 +57,11 @@ do
     -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
     -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
     ..
+
+  if [[ ${HOST} =~ .*darwin.* ]]; then
+    export CPP="$SAVED_CPP"; export CPPFLAGS="$SAVED_CPPFLAGS"
+    export CPATH="$SAVED_CPATH"; export C_INCLUDE_PATH="$SAVED_CIP"; export CPLUS_INCLUDE_PATH="$SAVED_CPLUSIP"
+  fi
 
   # macOS: historical hack to strip '-fallow-argument-mismatch' from generated flags if present.
   # Guarded to avoid failing when these targets are not generated.
