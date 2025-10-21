@@ -50,7 +50,6 @@ do
     -DBLA_VENDOR=OpenBLAS \
     -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
     -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     ..
 
   # macOS: historical hack to strip '-fallow-argument-mismatch' from generated flags if present.
