@@ -28,6 +28,7 @@ fi
 if [[ ${HOST} =~ .*darwin.* ]]; then
   # Force CMake to use the Fortran compiler from the build env (not host env).
   export FC="${BUILD_PREFIX}/bin/${HOST}-gfortran"
+  export CMAKE_Fortran_FLAGS="${FFLAGS}"
 fi
 
 # Tell CMake we want the OpenBLAS provider.
@@ -38,6 +39,7 @@ OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
 for shared_libs in OFF ON
 do
   cmake ${CMAKE_ARGS} \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_Fortran_COMPILER="${FC}" \
     -DCMAKE_PREFIX_PATH=${PREFIX} \
     -DCMAKE_INSTALL_PREFIX=${PREFIX} \
