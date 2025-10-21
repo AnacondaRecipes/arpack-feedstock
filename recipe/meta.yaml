@@ -44,7 +44,8 @@ build:
 
 requirements:
   build:
-    - cmake
+    - cmake >=3.3,<4.0
+    - cmake >=4.0  # [osx]
     - make  # [unix]
     - {{ compiler('fortran') }}  # [unix]
     - {{ compiler('c') }}  # [unix]
