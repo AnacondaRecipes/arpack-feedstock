@@ -44,6 +44,7 @@ requirements:
   build:
     - cmake >=3.5,<4.0
     - make  # [unix]
+    - {{ stdlib('c') }}     # [unix]
     - {{ compiler('fortran') }}  # [unix]
     - {{ compiler('c') }}  # [unix]
     - {{ compiler('cxx') }}  # [unix]
