@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Rationale summary:
 # - CMake couldn't find LAPACK → pass explicit BLAS/LAPACK = $PREFIX/lib/libopenblas${SHLIB_EXT} and set BLA_VENDOR=OpenBLAS.
@@ -8,7 +8,7 @@
 
 set -x
 
-mkdir build && cd build
+mkdir build && cd build || exit
 
 if [[ "$(echo $fortran_compiler_version | cut -d '.' -f 1)" -gt 9 ]]; then
   export FFLAGS="$FFLAGS -fallow-argument-mismatch"
@@ -16,7 +16,7 @@ fi
 
 if [[ ${HOST} =~ .*linux.* ]]; then
   # Need to point to libquadmath.so.0
-  export LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH="${PREFIX}"/lib:"$LD_LIBRARY_PATH"
   # Exclude -fopenmp from build due to linking erorr resolution for libgomp
   # IMPORTANT: drop OpenMP from compile flags so we don't pull libgomp into runtime.
   # Our repo does not ship 'libgomp', and --error-overlinking will flag it if present.
@@ -28,7 +28,6 @@ fi
 if [[ ${HOST} =~ .*darwin.* ]]; then
   # Force CMake to use the Fortran compiler from the build env (not host env).
   export FC="${BUILD_PREFIX}/bin/${HOST}-gfortran"
-  export CMAKE_Fortran_FLAGS="${FFLAGS}"
 fi
 
 # Tell CMake we want the OpenBLAS provider.
@@ -39,15 +38,14 @@ OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
 for shared_libs in OFF ON
 do
   cmake ${CMAKE_ARGS} \
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-    -DCMAKE_Fortran_COMPILER="${FC}" \
-    -DCMAKE_Fortran_FLAGS="${CMAKE_Fortran_FLAGS}" \
-    -DCMAKE_PREFIX_PATH=${PREFIX} \
-    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DSKIP_FORTRAN_TRY_COMPILE=ON \
+    -DCMAKE_Fortran_COMPILER_WORKS=1 \
+    -DCMAKE_PREFIX_PATH="${PREFIX}" \
+    -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_SHARED_LIBS=${shared_libs} \
     -DICB=ON \
-    -DMPI=${DMPI} \
+    -DMPI="${DMPI}" \
     -DTESTS=OFF \
     -DEXAMPLES=OFF \
     -DBLA_VENDOR=OpenBLAS \
@@ -63,12 +61,12 @@ do
       [ -f "$f" ] && sed -i '' 's/-fallow-argument-mismatch//g' "$f" || true
     done
   fi
-  make install -j${CPU_COUNT} VERBOSE=1
+  make install -j"${CPU_COUNT}" VERBOSE=1
 done
 
 if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
   # Do not run the test on osx as this test causes OS crashes on certain osx configurations.
-  if [[ ${HOST} =~ .*linux.* ]]; then
-    ctest --output-on-failure -j${CPU_COUNT}
+  if [[ "${HOST}" =~ .*linux.* ]]; then
+    ctest --output-on-failure -j"${CPU_COUNT}"
   fi
 fi
