@@ -13,6 +13,8 @@ cmake -G "Ninja" ^
   -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/% ^
   -DBUILD_SHARED_LIBS=OFF ^
   -DICB=ON ^
+  -DTESTS=OFF ^
+  -DEXAMPLES=OFF ^
   -DBLA_VENDOR=%BLA_VENDOR% ^
   ..
 if errorlevel 1 exit 1
@@ -26,6 +28,8 @@ cmake -G "Ninja" ^
   -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/% ^
   -DBUILD_SHARED_LIBS=ON ^
   -DICB=ON ^
+  -DTESTS=OFF ^
+  -DEXAMPLES=OFF ^
   -DBLA_VENDOR=%BLA_VENDOR% ^
   ..
 if errorlevel 1 exit 1
