@@ -6,16 +6,23 @@ mpi:
   - nompi                  # [not (osx and arm64)]
   - mpich                  # [not (osx and arm64) and not win]
 
-c_compiler:
-  - clang                  # [osx]
-cxx_compiler:
-  - clangxx                # [osx]
-fortran_compiler:
-  - gfortran               # [osx]
+numpy:
+  # python 3.10
+  - 2.4.4
+  # python 3.11
+  - 2.4.4
+  # python 3.12
+  - 2.4.4
+  # python 3.13
+  - 2.4.4
+  # python 3.14
+  - 2.4.4
 
-c_compiler_version:
-  - 20.1.8                 # [osx]
-cxx_compiler_version:
-  - 20.1.8                 # [osx]
+blas_impl:
+  - mkl                        # [(x86 or x86_64) and not osx]
+  - openblas
+
+fortran_compiler:
+  - flang             # [win]
 fortran_compiler_version:
-  - 14.3.0                 # [osx]
+  - 20                # [win]

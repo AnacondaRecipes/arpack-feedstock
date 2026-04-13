@@ -9,7 +9,7 @@
 
 {% set version = "3.9.0" %}
 {% set name = "arpack" %}
-{% set build = 2 %}
+{% set build = 3 %}
 
 package:
   name: {{ name|lower }}
@@ -23,7 +23,7 @@ build:
   number: {{ build }}
   # Arpack on win is built against mkl and nompi; Arpack on other archs is built against openblas and either nompi or mpich. 
   # osx-arm64 also uses openblas + openmpi combination in addition to nompi and mpich. 
-  skip: true  # [not win and blas_impl == "mkl"]
+
   # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi
   # add build string so packages can depend on
   # mpi or nompi variants explicitly:
