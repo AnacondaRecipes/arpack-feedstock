@@ -7,9 +7,9 @@
 #   than the one used by your current build environment.
 # To fix this, pin OpenBLAS to an older build from the 'defaults' channel that is compatible with your glibc version.
 
-{% set version = "3.9.0" %}
+{% set version = "3.9.1" %}
 {% set name = "arpack" %}
-{% set build = 4 %}
+{% set build = 0 %}
 
 package:
   name: {{ name|lower }}
@@ -17,7 +17,7 @@ package:
 
 source:
   url: https://github.com/opencollab/{{ name }}-ng/archive/{{ version }}.tar.gz
-  sha256: 24f2a2b259992d3c797d80f626878aa8e2ed5009d549dad57854bbcfb95e1ed0
+  sha256: f6641deb07fa69165b7815de9008af3ea47eb39b2bb97521fbf74c97aba6e844
 
 build:
   number: {{ build }}
@@ -80,10 +80,10 @@ test:
   commands:
     - test -f ${PREFIX}/lib/libarpack.a  # [unix]
     - test -f ${PREFIX}/lib/libarpack${SHLIB_EXT}  # [unix]
-    - test -f ${PREFIX}/include/arpack-ng/arpack.hpp  # [unix]
+    - test -f ${PREFIX}/include/arpack/arpack.hpp  # [unix]
     - if not exist %LIBRARY_LIB%\\arpack.lib exit 1  # [win]
     - if not exist %LIBRARY_BIN%\\arpack.dll exit 1  # [win]
-    - if not exist %LIBRARY_INC%\\arpack-ng\\arpack.hpp exit 1  # [win]
+    - if not exist %LIBRARY_INC%\\arpack\\arpack.hpp exit 1  # [win]
 
 about:
   home: https://github.com/opencollab/arpack-ng
