@@ -6,18 +6,6 @@ mpi:
   - nompi                  # [not (osx and arm64)]
   - mpich                  # [not (osx and arm64) and not win]
 
-numpy:
-  # python 3.10
-  - 2.4.4
-  # python 3.11
-  - 2.4.4
-  # python 3.12
-  - 2.4.4
-  # python 3.13
-  - 2.4.4
-  # python 3.14
-  - 2.4.4
-
 blas_impl:
   - mkl                        # [(x86 or x86_64) and not osx]
   - openblas
