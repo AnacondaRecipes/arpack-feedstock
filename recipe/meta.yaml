@@ -44,7 +44,7 @@ requirements:
   build:
     - cmake >=3.5,<4.0
     - make  # [unix]
-    - ninja  # [win]
+    - ninja-base  # [win]
     - {{ stdlib('c') }}
     - {{ compiler('fortran') }}
     - {{ compiler('c') }}
