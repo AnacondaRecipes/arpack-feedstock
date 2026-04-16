@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Rationale summary:
-# - CMake couldn't find LAPACK → pass explicit BLAS/LAPACK = $PREFIX/lib/libopenblas${SHLIB_EXT} and set BLA_VENDOR=OpenBLAS.
+# - BLA_VENDOR derived from $blas_impl variant; explicit BLAS/LAPACK paths only for OpenBLAS.
 # - --error-overlinking for libgomp → strip -fopenmp from *FLAGS and forbid finding OpenMP.
 # - macOS Fortran compiler ABI test failed → force FC from build env, remove f2c flags, add rpath to $PREFIX/lib.
 # - macOS overlinking to Accelerate/libcxx/llvm-openmp → don't add Accelerate; ignore run_exports for libcxx/llvm-openmp in meta.yaml.
@@ -30,10 +30,12 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   export FC="${BUILD_PREFIX}/bin/${HOST}-gfortran"
 fi
 
-# Tell CMake we want the OpenBLAS provider.
-export BLA_VENDOR=OpenBLAS
-# Pass the exact paths to BLAS/LAPACK to avoid FindLAPACK guessing (esp. under strict root paths).
-OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
+if [[ "${blas_impl}" == "mkl" ]]; then
+  BLAS_CMAKE_ARGS="-DBLA_VENDOR=Intel10_64lp_seq"
+else
+  OPENBLAS_LIB="${PREFIX}/lib/libopenblas${SHLIB_EXT}"
+  BLAS_CMAKE_ARGS="-DBLA_VENDOR=OpenBLAS -DBLAS_LIBRARIES=${OPENBLAS_LIB} -DLAPACK_LIBRARIES=${OPENBLAS_LIB}"
+fi
 
 for shared_libs in OFF ON
 do
@@ -48,9 +50,7 @@ do
     -DMPI="${DMPI}" \
     -DTESTS=OFF \
     -DEXAMPLES=OFF \
-    -DBLA_VENDOR=OpenBLAS \
-    -DBLAS_LIBRARIES="${OPENBLAS_LIB}" \
-    -DLAPACK_LIBRARIES="${OPENBLAS_LIB}" \
+    ${BLAS_CMAKE_ARGS} \
     ..
 
   # macOS: historical hack to strip '-fallow-argument-mismatch' from generated flags if present.

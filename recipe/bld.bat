@@ -1,32 +1,38 @@
-
-: remove sh.exe from PATH
-set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
-set PATH=%PATH:C:\Program Files\Git\bin;=%
-
 mkdir build && cd build
+if errorlevel 1 exit 1
 
-:: Static build - configure.
-cmake -G "MinGW Makefiles" ^
-  -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
-  -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
+if "%blas_impl%"=="mkl" (
+  set "BLA_VENDOR=Intel10_64lp_seq"
+) else (
+  set "BLA_VENDOR=OpenBLAS"
+)
+
+:: Static build
+cmake -G "Ninja" ^
+  -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX:\=/% ^
+  -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/% ^
   -DBUILD_SHARED_LIBS=OFF ^
   -DICB=ON ^
+  -DTESTS=OFF ^
+  -DEXAMPLES=OFF ^
+  -DBLA_VENDOR=%BLA_VENDOR% ^
   ..
 if errorlevel 1 exit 1
 
-:: Build.
-mingw32-make install -j %CPU_COUNT%
+ninja install -j %CPU_COUNT%
 if errorlevel 1 exit 1
 
-::  Shared build - configure.
-cmake -G "MinGW Makefiles" ^
-  -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
-  -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/%/mingw-w64 ^
+:: Shared build
+cmake -G "Ninja" ^
+  -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX:\=/% ^
+  -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX:\=/% ^
   -DBUILD_SHARED_LIBS=ON ^
   -DICB=ON ^
+  -DTESTS=OFF ^
+  -DEXAMPLES=OFF ^
+  -DBLA_VENDOR=%BLA_VENDOR% ^
   ..
 if errorlevel 1 exit 1
 
-:: Build.
-mingw32-make install -j %CPU_COUNT%
+ninja install -j %CPU_COUNT%
 if errorlevel 1 exit 1

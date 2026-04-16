@@ -7,9 +7,9 @@
 #   than the one used by your current build environment.
 # To fix this, pin OpenBLAS to an older build from the 'defaults' channel that is compatible with your glibc version.
 
-{% set version = "3.9.0" %}
+{% set version = "3.9.1" %}
 {% set name = "arpack" %}
-{% set build = 2 %}
+{% set build = 0 %}
 
 package:
   name: {{ name|lower }}
@@ -17,13 +17,13 @@ package:
 
 source:
   url: https://github.com/opencollab/{{ name }}-ng/archive/{{ version }}.tar.gz
-  sha256: 24f2a2b259992d3c797d80f626878aa8e2ed5009d549dad57854bbcfb95e1ed0
+  sha256: f6641deb07fa69165b7815de9008af3ea47eb39b2bb97521fbf74c97aba6e844
 
 build:
   number: {{ build }}
-  # Arpack on win is built against mkl and nompi; Arpack on other archs is built against openblas and either nompi or mpich. 
-  # osx-arm64 also uses openblas + openmpi combination in addition to nompi and mpich. 
-  skip: true  # [not win and blas_impl == "mkl"]
+  # Windows: mkl + openblas, nompi only. Unix: openblas (+ mkl on x86/x86_64 linux), nompi/mpich.
+  # osx-arm64 also uses openblas + openmpi in addition to nompi and mpich.
+
   # Per https://conda-forge.org/docs/maintainer/knowledge_base.html#preferring-a-provider-usually-nompi
   # add build string so packages can depend on
   # mpi or nompi variants explicitly:
@@ -44,13 +44,11 @@ requirements:
   build:
     - cmake >=3.5,<4.0
     - make  # [unix]
-    - {{ stdlib('c') }}     # [unix]
-    - {{ compiler('fortran') }}  # [unix]
-    - {{ compiler('c') }}  # [unix]
-    - {{ compiler('cxx') }}  # [unix]
-    - {{ compiler('m2w64_fortran') }}  # [win]
-    - {{ compiler('m2w64_c') }}  # [win]
-    - {{ compiler('m2w64_cxx') }}  # [win]
+    - ninja-base  # [win]
+    - {{ stdlib('c') }}
+    - {{ compiler('fortran') }}
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - llvm-openmp  # [osx and not (blas_impl == "mkl")]
   host:
     # MPI/OpenMP
@@ -66,7 +64,6 @@ requirements:
     # IMPORTANT: use 'openblas' in host so headers + CMake config are available.
     - openblas {{ openblas }}  # [blas_impl == "openblas"]
   run:
-    - m2w64-gcc-libgfortran  # [win]
     # MPI/OpenMP
     - openmpi   # [mpi == 'openmpi']
     - {{ mpi }}              # [mpi == 'mpich']
@@ -83,11 +80,10 @@ test:
   commands:
     - test -f ${PREFIX}/lib/libarpack.a  # [unix]
     - test -f ${PREFIX}/lib/libarpack${SHLIB_EXT}  # [unix]
-    - test -f ${PREFIX}/include/arpack-ng/arpack.hpp  # [unix]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\lib\\libarpack.a exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\lib\\libarpack.dll.a exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\bin\\libarpack.dll exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\mingw-w64\\include\\arpack-ng\\arpack.hpp exit 1  # [win]
+    - test -f ${PREFIX}/include/arpack/arpack.hpp  # [unix]
+    - if not exist %LIBRARY_LIB%\\arpack.lib exit 1  # [win]
+    - if not exist %LIBRARY_BIN%\\arpack.dll exit 1  # [win]
+    - if not exist %LIBRARY_INC%\\arpack\\arpack.hpp exit 1  # [win]
 
 about:
   home: https://github.com/opencollab/arpack-ng
